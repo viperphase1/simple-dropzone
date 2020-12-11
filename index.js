@@ -13,9 +13,13 @@ class SimpleDropzone {
    * @param  {Element} el
    * @param  {Element} inputEl
    */
-  constructor (el, inputEl) {
+  constructor (el, inputEl, options) {
     this.el = el;
     this.inputEl = inputEl;
+    this.options = {
+      unzip: true
+    };
+    Object.assign(this.options, options);
 
     this.listeners = {
       drop: [],
@@ -96,7 +100,7 @@ class SimpleDropzone {
     if (items.length > 0) {
       const entries = items.map((item) => item.webkitGetAsEntry());
 
-      if (entries[0].name.match(/\.zip$/)) {
+      if (this.options.unzip && entries[0].name.match(/\.zip$/)) {
         this._loadZip(items[0].getAsFile());
       } else {
         this._loadNextEntry(new Map(), entries);
@@ -106,7 +110,7 @@ class SimpleDropzone {
     }
 
     // Fall back to .files, since folders can't be traversed.
-    if (files.length === 1 && files[0].name.match(/\.zip$/)) {
+    if (this.options.unzip && files.length === 1 && files[0].name.match(/\.zip$/)) {
       this._loadZip(files[0]);
     }
     this._emit('drop', {files: new Map(files.map((file) => [file.name, file]))});
